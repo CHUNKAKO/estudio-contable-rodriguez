@@ -98,7 +98,25 @@ def arca_home():
             dia = int(mono_match.group(2))
             mes = meses[mes_txt]
             anio = datetime.now().year
+            
+            mono_date = iso(dia, mes, anio)
 
+            items.append(
+                dict(
+                    org='ARCA',
+                    cat='monotributo',
+                    title='Monotributo',
+                    period='Pago mensual',
+                    date=mono_date,
+                    rows=[
+                        ['Todas las terminaciones', f'{dia:02d}/{mes:02d}/{anio}']
+                    ],
+                    source=mono_url
+                )
+            )
+
+            print('MONO VENCIMIENTO DETECTADO:', mono_date)
+        
         print('--- DIAGNOSTICO MONOTRIBUTO ---')
         print('MONO caracteres:', len(mono_text))
         print('MONO contenido:', mono_text[:2000])
