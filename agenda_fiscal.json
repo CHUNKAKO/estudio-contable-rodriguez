@@ -1,11 +1,11 @@
 {
   "meta": {
     "version": "4.3",
-    "generated_at": "2026-10-26T16:35:38.770383+00:00",
+    "generated_at": "2026-10-26T16:40:13.872471+00:00",
     "sources": {
       "ARCA": {
-        "ok": false,
-        "count": 0
+        "ok": true,
+        "count": 1
       },
       "ARBA_IIBB": {
         "ok": true,
@@ -523,7 +523,7 @@
           "20/10/2026"
         ]
       ],
-      "source": "https://www.arca.gob.ar/monotributo/"
+      "source": "https://ftp.arca.gob.ar/monotributo/default.asp"
     },
     {
       "org": "ARCA",
