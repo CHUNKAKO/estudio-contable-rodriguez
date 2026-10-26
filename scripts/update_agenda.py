@@ -59,9 +59,8 @@ def arca_home():
             print('MONO CONTIENE PAGO MENSUAL:', 'pago mensual' in mono_text.lower())
             
             mono_match = re.search(
-                r'Pr[oó]ximos?\s+vencimientos?.{0,120}?'
                 r'(ENE|FEB|MAR|ABR|MAY|JUN|JUL|AGO|SEP|OCT|NOV|DIC)'
-                r'\s+(\d{1,2}).{0,120}?Pago mensual',
+                r'\s+(\d{1,2}).{0,300}?Pago\s+mensual',
                 mono_text,
                 re.I | re.S
             )
