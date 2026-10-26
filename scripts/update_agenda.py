@@ -69,6 +69,8 @@ def arca_home():
     if soup is None:
         return []
 
+    items = []
+    
     # Diagnóstico del micrositio oficial de Monotributo
     print('>>> INICIANDO PRUEBA MONOTRIBUTO <<<')
     try:
@@ -76,6 +78,26 @@ def arca_home():
         mono_html = get(mono_url)
         mono_soup = BeautifulSoup(mono_html, 'html.parser')
         mono_text = ' '.join(mono_soup.stripped_strings)
+    # Extraer próximo vencimiento mensual publicado por ARCA
+        meses = {
+            'ENE': 1, 'FEB': 2, 'MAR': 3, 'ABR': 4,
+            'MAY': 5, 'JUN': 6, 'JUL': 7, 'AGO': 8,
+            'SEP': 9, 'OCT': 10, 'NOV': 11, 'DIC': 12
+        }
+
+        mono_match = re.search(
+            r'Pr[oó]ximos?\s+vencimientos?.{0,80}?'
+            r'(ENE|FEB|MAR|ABR|MAY|JUN|JUL|AGO|SEP|OCT|NOV|DIC)'
+            r'\s+(\d{1,2}).{0,80}?Pago mensual',
+            mono_text,
+            re.I | re.S
+        )
+
+        if mono_match:
+            mes_txt = mono_match.group(1).upper()
+            dia = int(mono_match.group(2))
+            mes = meses[mes_txt]
+            anio = datetime.now().year
 
         print('--- DIAGNOSTICO MONOTRIBUTO ---')
         print('MONO caracteres:', len(mono_text))
@@ -106,8 +128,6 @@ def arca_home():
         for x in soup.stripped_strings
         if x.strip()
     )
-
-    items = []
 
     specs = [
         (
