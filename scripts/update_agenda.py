@@ -25,23 +25,33 @@ def dmy_to_iso(x):
     return iso(m.group(1),m.group(2),m.group(3)) if m else None
 
 def arca_home():
-    url = 'https://www.arca.gob.ar/'
-    soup = BeautifulSoup(get(url), 'html.parser')
+    # La portada simple puede devolver cuerpo vacío a GitHub Actions.
+    # Probamos primero el landing oficial y dejamos alternativas oficiales.
+    urls = [
+        'https://arca.gob.ar/landing/default.asp',
+        'https://www.arca.gob.ar/landing/default.asp',
+        'https://arca.gob.ar/',
+    ]
 
-    print('--- DIAGNOSTICO ARCA ---')
-    print('URL consultada:', url)
-    print('Titulo recibido:', soup.title.get_text(' ', strip=True) if soup.title else 'SIN TITULO')
+    soup = None
+    source_url = None
 
-    diagnostic_text = ' '.join(soup.stripped_strings)
-    print('Caracteres recibidos:', len(diagnostic_text))
-    print('Contiene IVA:', 'iva' in diagnostic_text.lower())
-    print('Contiene Monotributo:', 'monotributo' in diagnostic_text.lower())
-    print('Contiene Ganancias:', 'ganancias' in diagnostic_text.lower())
-    print('Contiene SICORE:', 'sicore' in diagnostic_text.lower())
-    print('Contiene Seguridad Social:', 'seguridad social' in diagnostic_text.lower())
-    print('Muestra inicial:', diagnostic_text[:800])
-    print('--- FIN DIAGNOSTICO ARCA ---')
-    # Extraemos texto visible y normalizamos espacios.
+    for url in urls:
+        try:
+            html = get(url)
+            candidate = BeautifulSoup(html, 'html.parser')
+            candidate_text = ' '.join(candidate.stripped_strings)
+
+            if len(candidate_text) > 200:
+                soup = candidate
+                source_url = url
+                break
+        except Exception:
+            continue
+
+    if soup is None:
+        return []
+
     text = '\n'.join(
         re.sub(r'\s+', ' ', x.strip())
         for x in soup.stripped_strings
@@ -50,119 +60,142 @@ def arca_home():
 
     items = []
 
-    # Categorías que queremos publicar en la agenda del estudio.
-    # Se admiten distintas formas de nombrarlas porque ARCA puede
-    # modificar los títulos de su portada.
     specs = [
-        ('iva', 'IVA', [
-            r'\bIVA\b',
-            r'Libro IVA Digital',
-            r'IVA y Libro IVA Digital',
-        ]),
-        ('monotributo', 'Monotributo', [
-            r'Monotributo',
-        ]),
-        ('ganancias', 'Ganancias', [
-            r'Ganancias',
-            r'Impuesto a las Ganancias',
-        ]),
-        ('sicore', 'SICORE', [
-            r'SICORE',
-            r'Sistema de Control de Retenciones',
-        ]),
-        ('cargas', 'Seguridad Social', [
-            r'Seguridad Social',
-            r'Cargas Sociales',
-            r'Empleadores',
-        ]),
+        (
+            'iva',
+            'IVA y Libro IVA Digital',
+            [
+                r'IVA y Libro (?:de )?IVA Digital',
+                r'IVA Simple',
+            ],
+            'Presentación y pago de declaración jurada'
+        ),
+        (
+            'monotributo',
+            'Monotributo',
+            [r'Monotributo'],
+            'Pago mensual'
+        ),
+        (
+            'ganancias',
+            'Ganancias',
+            [
+                r'Ganancias',
+                r'Impuesto a las Ganancias',
+            ],
+            'Presentación y/o pago'
+        ),
+        (
+            'sicore',
+            'SICORE',
+            [
+                r'SICORE',
+                r'Sistema de Control de Retenciones',
+            ],
+            'Retenciones y percepciones'
+        ),
+        (
+            'cargas',
+            'Seguridad Social',
+            [
+                r'Seguridad Social',
+                r'Cargas Sociales',
+                r'Empleadores',
+            ],
+            'Obligaciones de Seguridad Social'
+        ),
     ]
 
-    # ARCA puede mostrar fechas como dd/mm/yyyy o dd-mm-yyyy.
-    date_pattern = r'\b(\d{1,2})[/-](\d{1,2})[/-](202[6-9])\b'
+    date_pattern = r'\b(\d{1,2})/(\d{1,2})/(202[6-9])\b'
 
-    for cat, title, aliases in specs:
-        matches = []
+    for cat, title, aliases, period in specs:
+        positions = []
 
         for alias in aliases:
-            for m in re.finditer(alias, text, re.I):
-                matches.append(m.start())
+            positions.extend(
+                m.start()
+                for m in re.finditer(alias, text, re.I)
+            )
 
-        if not matches:
+        if not positions:
             continue
 
-        # Revisamos una ventana amplia alrededor de cada mención de
-        # la obligación. Esto evita depender de la estructura HTML.
-        candidate_segments = []
-        for pos in sorted(set(matches)):
-            start = max(0, pos - 250)
-            end = min(len(text), pos + 2500)
-            candidate_segments.append(text[start:end])
+        rows = []
 
-        found = []
+        for pos in sorted(set(positions)):
+            # Buscamos principalmente hacia adelante desde el título
+            # para evitar capturar fechas de la obligación anterior.
+            seg = text[pos:min(len(text), pos + 1800)]
 
-        for seg in candidate_segments:
-            # Primero intentamos conservar vencimientos por CUIT.
+            # Cronogramas habituales por terminación de CUIT.
             for label in [
                 '0-1', '2-3', '4-5', '6-7', '8-9',
-                '0-2', '3-5', '6-7', '8-9'
+                '0-2', '3-5'
             ]:
-                pat = (
-                    re.escape(label)
-                    + r'.{0,180}?'
-                    + date_pattern
+                m = re.search(
+                    re.escape(label) +
+                    r'.{0,180}?' +
+                    date_pattern,
+                    seg,
+                    re.I | re.S
                 )
-                m = re.search(pat, seg, re.I | re.S)
-                if m:
-                    d = f'{m.group(1)}/{m.group(2)}/{m.group(3)}'
-                    found.append([f'CUIT {label}', d])
 
-            # Si ARCA publica una única fecha, también la aceptamos.
-            if not found:
-                dates = re.findall(date_pattern, seg)
-                for d, mo, y in dates:
-                    found.append([
-                        'Todas las terminaciones',
-                        f'{d}/{mo}/{y}'
+                if m:
+                    rows.append([
+                        f'CUIT {label}',
+                        f'{m.group(1)}/{m.group(2)}/{m.group(3)}'
                     ])
 
-            if found:
+            # Obligaciones con vencimiento único para todos.
+            if not rows:
+                m = re.search(
+                    r'(?:Todos|Todas|Todas las terminaciones)'
+                    r'.{0,180}?' +
+                    date_pattern,
+                    seg,
+                    re.I | re.S
+                )
+
+                if m:
+                    rows.append([
+                        'Todas las terminaciones',
+                        f'{m.group(1)}/{m.group(2)}/{m.group(3)}'
+                    ])
+
+            # Último recurso: primera fecha explícita cercana al título.
+            if not rows:
+                m = re.search(date_pattern, seg)
+
+                if m:
+                    rows.append([
+                        'Todas las terminaciones',
+                        f'{m.group(1)}/{m.group(2)}/{m.group(3)}'
+                    ])
+
+            if rows:
                 break
 
-        if not found:
+        if not rows:
             continue
 
-        # Eliminar duplicados manteniendo el orden.
-        rows = []
+        # Eliminar duplicados.
+        unique_rows = []
         seen = set()
-        for row in found:
+
+        for row in rows:
             key = tuple(row)
             if key not in seen:
                 seen.add(key)
-                rows.append(row)
+                unique_rows.append(row)
 
         valid_dates = [
             dmy_to_iso(row[1])
-            for row in rows
+            for row in unique_rows
             if dmy_to_iso(row[1])
         ]
 
         if not valid_dates:
             continue
-
-        first = min(valid_dates)
-
-        if cat == 'iva':
-            period = 'Presentación y pago de declaración jurada'
-        elif cat == 'monotributo':
-            period = 'Pago mensual'
-        elif cat == 'ganancias':
-            period = 'Presentación y/o pago'
-        elif cat == 'sicore':
-            period = 'Retenciones y percepciones'
-        elif cat == 'cargas':
-            period = 'Obligaciones de Seguridad Social'
-        else:
-            period = 'Vencimiento publicado por ARCA'
 
         items.append(
             dict(
@@ -170,9 +203,9 @@ def arca_home():
                 cat=cat,
                 title=title,
                 period=period,
-                date=first,
-                rows=rows,
-                source=url
+                date=min(valid_dates),
+                rows=unique_rows,
+                source=source_url
             )
         )
 
