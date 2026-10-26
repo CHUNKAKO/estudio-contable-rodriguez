@@ -55,6 +55,7 @@ def arca_home():
                 soup = candidate
                 source_url = url
                 print('ARCA fuente seleccionada:', source_url)
+                print('ARCA contenido recibido:', candidate_text[:2000])
                 break
 
         except Exception as e:
