@@ -1,0 +1,4 @@
+Estudio Rodriguez Web V4.1 - Modernización visual de V4.
+Mantiene funciones de novedades, filtros, mapa, contacto y WhatsApp.
+index.html: sitio público.
+admin_novedades.html: panel local de novedades.
