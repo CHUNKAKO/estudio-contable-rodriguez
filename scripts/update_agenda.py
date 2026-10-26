@@ -28,6 +28,19 @@ def arca_home():
     url = 'https://www.arca.gob.ar/'
     soup = BeautifulSoup(get(url), 'html.parser')
 
+    print('--- DIAGNOSTICO ARCA ---')
+    print('URL consultada:', url)
+    print('Titulo recibido:', soup.title.get_text(' ', strip=True) if soup.title else 'SIN TITULO')
+
+    diagnostic_text = ' '.join(soup.stripped_strings)
+    print('Caracteres recibidos:', len(diagnostic_text))
+    print('Contiene IVA:', 'iva' in diagnostic_text.lower())
+    print('Contiene Monotributo:', 'monotributo' in diagnostic_text.lower())
+    print('Contiene Ganancias:', 'ganancias' in diagnostic_text.lower())
+    print('Contiene SICORE:', 'sicore' in diagnostic_text.lower())
+    print('Contiene Seguridad Social:', 'seguridad social' in diagnostic_text.lower())
+    print('Muestra inicial:', diagnostic_text[:800])
+    print('--- FIN DIAGNOSTICO ARCA ---')
     # Extraemos texto visible y normalizamos espacios.
     text = '\n'.join(
         re.sub(r'\s+', ' ', x.strip())
