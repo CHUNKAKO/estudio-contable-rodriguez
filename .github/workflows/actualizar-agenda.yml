@@ -1,0 +1,43 @@
+name: Actualizar Agenda Fiscal ARCA y ARBA
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    # Todos los días a las 07:15 de Argentina (10:15 UTC)
+    - cron: "15 10 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  actualizar-agenda:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Consultar ARCA y ARBA
+        run: python scripts/update_agenda.py
+
+      - name: Guardar agenda actualizada
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet agenda_fiscal.json; then
+            echo "No hay cambios en la agenda fiscal."
+          else
+            git add agenda_fiscal.json
+            git commit -m "Actualización automática agenda fiscal ARCA y ARBA"
+            git push
+          fi
