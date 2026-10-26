@@ -70,6 +70,7 @@ def arca_home():
         return []
 
     # Diagnóstico del micrositio oficial de Monotributo
+    print('>>> INICIANDO PRUEBA MONOTRIBUTO <<<')
     try:
         mono_url = 'https://ftp.arca.gob.ar/monotributo/default.asp'
         mono_html = get(mono_url)
