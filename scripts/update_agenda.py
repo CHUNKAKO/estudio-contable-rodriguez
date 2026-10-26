@@ -56,6 +56,10 @@ def arca_home():
                 source_url = url
                 print('ARCA fuente seleccionada:', source_url)
                 print('ARCA contenido recibido:', candidate_text[:2000])
+                print('--- ENLACES ARCA ---')
+                for a in candidate.find_all('a', href=True):
+                    print('ARCA LINK:', a.get_text(' ', strip=True)[:80], '=>', urljoin(url, a['href']))
+                print('--- FIN ENLACES ARCA ---')
                 break
 
         except Exception as e:
