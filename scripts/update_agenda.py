@@ -25,80 +25,61 @@ def dmy_to_iso(x):
     return iso(m.group(1),m.group(2),m.group(3)) if m else None
 
 def arca_home():
-    # La portada simple puede devolver cuerpo vacío a GitHub Actions.
-    # Probamos primero el landing oficial y dejamos alternativas oficiales.
-    urls = [
-    'https://ftp.arca.gob.ar/',
-    'https://ftp.arca.gob.ar/landing/default.asp',
-    'https://arca.gob.ar/landing/default.asp',
-    'https://www.arca.gob.ar/landing/default.asp',
-    'https://arca.gob.ar/',
-]
+    items = []
 
-    soup = None
-    source_url = None
+    # Meses publicados por ARCA en formato abreviado.
+    meses = {
+        'ENE': 1, 'FEB': 2, 'MAR': 3, 'ABR': 4,
+        'MAY': 5, 'JUN': 6, 'JUL': 7, 'AGO': 8,
+        'SEP': 9, 'OCT': 10, 'NOV': 11, 'DIC': 12
+    }
 
-    for url in urls:
+    # ---------------------------------------------------------
+    # MONOTRIBUTO
+    # ---------------------------------------------------------
+    # El micrositio oficial publica:
+    # "Próximos vencimientos OCT 20 Pago mensual"
+    mono_urls = [
+        'https://ftp.arca.gob.ar/monotributo/default.asp',
+        'https://www.arca.gob.ar/monotributo/default.asp',
+    ]
+
+    for mono_url in mono_urls:
         try:
-            html = get(url)
-            candidate = BeautifulSoup(html, 'html.parser')
-            candidate_text = ' '.join(candidate.stripped_strings)
+            mono_html = get(mono_url)
+            mono_soup = BeautifulSoup(mono_html, 'html.parser')
 
-            print(
-                'ARCA intento:',
-                url,
-                '- caracteres:',
-                len(candidate_text)
+            mono_text = ' '.join(
+                re.sub(r'\s+', ' ', x.strip())
+                for x in mono_soup.stripped_strings
+                if x.strip()
             )
 
-            if len(candidate_text) > 200:
-                soup = candidate
-                source_url = url
-                print('ARCA fuente seleccionada:', source_url)
-                print('ARCA contenido recibido:', candidate_text[:2000])
-                print('--- ENLACES ARCA ---')
-                for a in candidate.find_all('a', href=True):
-                    print('ARCA LINK:', a.get_text(' ', strip=True)[:80], '=>', urljoin(url, a['href']))
-                print('--- FIN ENLACES ARCA ---')
-                break
+            mono_match = re.search(
+                r'Pr[oó]ximos?\s+vencimientos?.{0,120}?'
+                r'(ENE|FEB|MAR|ABR|MAY|JUN|JUL|AGO|SEP|OCT|NOV|DIC)'
+                r'\s+(\d{1,2}).{0,120}?Pago mensual',
+                mono_text,
+                re.I | re.S
+            )
 
-        except Exception as e:
-            print('ARCA error:', url, '-', str(e)[:160])
-            continue
+            if not mono_match:
+                continue
 
-    if soup is None:
-        return []
-
-    items = []
-    
-    # Diagnóstico del micrositio oficial de Monotributo
-    print('>>> INICIANDO PRUEBA MONOTRIBUTO <<<')
-    try:
-        mono_url = 'https://ftp.arca.gob.ar/monotributo/default.asp'
-        mono_html = get(mono_url)
-        mono_soup = BeautifulSoup(mono_html, 'html.parser')
-        mono_text = ' '.join(mono_soup.stripped_strings)
-    # Extraer próximo vencimiento mensual publicado por ARCA
-        meses = {
-            'ENE': 1, 'FEB': 2, 'MAR': 3, 'ABR': 4,
-            'MAY': 5, 'JUN': 6, 'JUL': 7, 'AGO': 8,
-            'SEP': 9, 'OCT': 10, 'NOV': 11, 'DIC': 12
-        }
-
-        mono_match = re.search(
-            r'Pr[oó]ximos?\s+vencimientos?.{0,80}?'
-            r'(ENE|FEB|MAR|ABR|MAY|JUN|JUL|AGO|SEP|OCT|NOV|DIC)'
-            r'\s+(\d{1,2}).{0,80}?Pago mensual',
-            mono_text,
-            re.I | re.S
-        )
-
-        if mono_match:
             mes_txt = mono_match.group(1).upper()
             dia = int(mono_match.group(2))
             mes = meses[mes_txt]
-            anio = datetime.now().year
-            
+
+            # El micrositio muestra el próximo vencimiento.
+            # Determinamos el año tomando como referencia la fecha actual.
+            hoy = datetime.now()
+            anio = hoy.year
+
+            # Si en diciembre ARCA ya publica un vencimiento de enero,
+            # corresponde al año siguiente.
+            if hoy.month == 12 and mes == 1:
+                anio += 1
+
             mono_date = iso(dia, mes, anio)
 
             items.append(
@@ -109,194 +90,34 @@ def arca_home():
                     period='Pago mensual',
                     date=mono_date,
                     rows=[
-                        ['Todas las terminaciones', f'{dia:02d}/{mes:02d}/{anio}']
+                        [
+                            'Todas las terminaciones',
+                            f'{dia:02d}/{mes:02d}/{anio}'
+                        ]
                     ],
                     source=mono_url
                 )
             )
 
-            print('MONO VENCIMIENTO DETECTADO:', mono_date)
-        
-        print('--- DIAGNOSTICO MONOTRIBUTO ---')
-        print('MONO caracteres:', len(mono_text))
-        print('MONO contenido:', mono_text[:2000])
-
-        for a in mono_soup.find_all('a', href=True):
-            label = a.get_text(' ', strip=True)
-            href = urljoin(mono_url, a['href'])
-
-            if (
-                'venc' in label.lower()
-                or 'calend' in label.lower()
-                or 'pago' in label.lower()
-                or 'fecha' in label.lower()
-                or 'venc' in href.lower()
-                or 'calend' in href.lower()
-            ):
-                print('MONO LINK:', label[:100], '=>', href)
-
-        print('--- FIN DIAGNOSTICO MONOTRIBUTO ---')
-
-    except Exception as e:
-        print('MONO ERROR:', str(e)[:200])
-    
-    
-    text = '\n'.join(
-        re.sub(r'\s+', ' ', x.strip())
-        for x in soup.stripped_strings
-        if x.strip()
-    )
-
-    specs = [
-        (
-            'iva',
-            'IVA y Libro IVA Digital',
-            [
-                r'IVA y Libro (?:de )?IVA Digital',
-                r'IVA Simple',
-            ],
-            'Presentación y pago de declaración jurada'
-        ),
-        (
-            'monotributo',
-            'Monotributo',
-            [r'Monotributo'],
-            'Pago mensual'
-        ),
-        (
-            'ganancias',
-            'Ganancias',
-            [
-                r'Ganancias',
-                r'Impuesto a las Ganancias',
-            ],
-            'Presentación y/o pago'
-        ),
-        (
-            'sicore',
-            'SICORE',
-            [
-                r'SICORE',
-                r'Sistema de Control de Retenciones',
-            ],
-            'Retenciones y percepciones'
-        ),
-        (
-            'cargas',
-            'Seguridad Social',
-            [
-                r'Seguridad Social',
-                r'Cargas Sociales',
-                r'Empleadores',
-            ],
-            'Obligaciones de Seguridad Social'
-        ),
-    ]
-
-    date_pattern = r'\b(\d{1,2})/(\d{1,2})/(202[6-9])\b'
-
-    for cat, title, aliases, period in specs:
-        positions = []
-
-        for alias in aliases:
-            positions.extend(
-                m.start()
-                for m in re.finditer(alias, text, re.I)
+            print(
+                'ARCA Monotributo:',
+                mono_date,
+                '- fuente:',
+                mono_url
             )
 
-        if not positions:
-            continue
+            break
 
-        rows = []
-
-        for pos in sorted(set(positions)):
-            # Buscamos principalmente hacia adelante desde el título
-            # para evitar capturar fechas de la obligación anterior.
-            seg = text[pos:min(len(text), pos + 1800)]
-
-            # Cronogramas habituales por terminación de CUIT.
-            for label in [
-                '0-1', '2-3', '4-5', '6-7', '8-9',
-                '0-2', '3-5'
-            ]:
-                m = re.search(
-                    re.escape(label) +
-                    r'.{0,180}?' +
-                    date_pattern,
-                    seg,
-                    re.I | re.S
-                )
-
-                if m:
-                    rows.append([
-                        f'CUIT {label}',
-                        f'{m.group(1)}/{m.group(2)}/{m.group(3)}'
-                    ])
-
-            # Obligaciones con vencimiento único para todos.
-            if not rows:
-                m = re.search(
-                    r'(?:Todos|Todas|Todas las terminaciones)'
-                    r'.{0,180}?' +
-                    date_pattern,
-                    seg,
-                    re.I | re.S
-                )
-
-                if m:
-                    rows.append([
-                        'Todas las terminaciones',
-                        f'{m.group(1)}/{m.group(2)}/{m.group(3)}'
-                    ])
-
-            # Último recurso: primera fecha explícita cercana al título.
-            if not rows:
-                m = re.search(date_pattern, seg)
-
-                if m:
-                    rows.append([
-                        'Todas las terminaciones',
-                        f'{m.group(1)}/{m.group(2)}/{m.group(3)}'
-                    ])
-
-            if rows:
-                break
-
-        if not rows:
-            continue
-
-        # Eliminar duplicados.
-        unique_rows = []
-        seen = set()
-
-        for row in rows:
-            key = tuple(row)
-            if key not in seen:
-                seen.add(key)
-                unique_rows.append(row)
-
-        valid_dates = [
-            dmy_to_iso(row[1])
-            for row in unique_rows
-            if dmy_to_iso(row[1])
-        ]
-
-        if not valid_dates:
-            continue
-
-        items.append(
-            dict(
-                org='ARCA',
-                cat=cat,
-                title=title,
-                period=period,
-                date=min(valid_dates),
-                rows=unique_rows,
-                source=source_url
+        except Exception as e:
+            print(
+                'ARCA Monotributo error:',
+                mono_url,
+                '-',
+                str(e)[:160]
             )
-        )
 
     return items
+
 
 def arba_iibb_local():
     url='https://web.arba.gov.ar/vencimientos-contribuyentes-locales'
