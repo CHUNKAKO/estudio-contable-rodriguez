@@ -27,11 +27,13 @@ def dmy_to_iso(x):
 def arca_home():
     # La portada simple puede devolver cuerpo vacío a GitHub Actions.
     # Probamos primero el landing oficial y dejamos alternativas oficiales.
-    urls = [
-        'https://arca.gob.ar/landing/default.asp',
-        'https://www.arca.gob.ar/landing/default.asp',
-        'https://arca.gob.ar/',
-    ]
+urls = [
+    'https://ftp.arca.gob.ar/',
+    'https://ftp.arca.gob.ar/landing/default.asp',
+    'https://arca.gob.ar/landing/default.asp',
+    'https://www.arca.gob.ar/landing/default.asp',
+    'https://arca.gob.ar/',
+]
 
     soup = None
     source_url = None
@@ -42,12 +44,21 @@ def arca_home():
             candidate = BeautifulSoup(html, 'html.parser')
             candidate_text = ' '.join(candidate.stripped_strings)
 
-            if len(candidate_text) > 200:
-                soup = candidate
-                source_url = url
-                break
-        except Exception:
-            continue
+print(
+    'ARCA intento:',
+    url,
+    '- caracteres:',
+    len(candidate_text)
+)
+
+if len(candidate_text) > 200:
+    soup = candidate
+    source_url = url
+    print('ARCA fuente seleccionada:', source_url)
+    break
+except Exception as e:
+    print('ARCA error:', url, '-', str(e)[:160])
+    continue
 
     if soup is None:
         return []
