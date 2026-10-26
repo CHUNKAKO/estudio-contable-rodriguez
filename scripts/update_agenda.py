@@ -54,7 +54,10 @@ def arca_home():
                 for x in mono_soup.stripped_strings
                 if x.strip()
             )
-
+           
+            print('MONO TEXTO:', repr(mono_text[-500:]))
+            print('MONO CONTIENE PAGO MENSUAL:', 'pago mensual' in mono_text.lower())
+            
             mono_match = re.search(
                 r'Pr[oó]ximos?\s+vencimientos?.{0,120}?'
                 r'(ENE|FEB|MAR|ABR|MAY|JUN|JUL|AGO|SEP|OCT|NOV|DIC)'
