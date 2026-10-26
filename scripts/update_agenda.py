@@ -69,6 +69,37 @@ def arca_home():
     if soup is None:
         return []
 
+    # Diagnóstico del micrositio oficial de Monotributo
+    try:
+        mono_url = 'https://ftp.arca.gob.ar/monotributo/default.asp'
+        mono_html = get(mono_url)
+        mono_soup = BeautifulSoup(mono_html, 'html.parser')
+        mono_text = ' '.join(mono_soup.stripped_strings)
+
+        print('--- DIAGNOSTICO MONOTRIBUTO ---')
+        print('MONO caracteres:', len(mono_text))
+        print('MONO contenido:', mono_text[:2000])
+
+        for a in mono_soup.find_all('a', href=True):
+            label = a.get_text(' ', strip=True)
+            href = urljoin(mono_url, a['href'])
+
+            if (
+                'venc' in label.lower()
+                or 'calend' in label.lower()
+                or 'pago' in label.lower()
+                or 'fecha' in label.lower()
+                or 'venc' in href.lower()
+                or 'calend' in href.lower()
+            ):
+                print('MONO LINK:', label[:100], '=>', href)
+
+        print('--- FIN DIAGNOSTICO MONOTRIBUTO ---')
+
+    except Exception as e:
+        print('MONO ERROR:', str(e)[:200])
+    
+    
     text = '\n'.join(
         re.sub(r'\s+', ' ', x.strip())
         for x in soup.stripped_strings
