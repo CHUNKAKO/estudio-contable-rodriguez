@@ -232,15 +232,62 @@ def arca_home():
                         pos_iva = texto_resultado.find(marcador_iva)
 
                         if pos_iva != -1:
-                           bloque_iva = texto_resultado[pos_iva:pos_iva + 1200]
-                           print(
-                               'IVA MENSUAL BLOQUE:',
-                               repr(bloque_iva)
-                           )
+                            bloque_iva = texto_resultado[pos_iva:pos_iva + 600]
+
+                            patron_iva = re.compile(
+                                r'correspondiente a:\s*'
+                                r'([A-Za-zÁÉÍÓÚáéíóúñÑ]+/\d{4}).*?'
+                                r'0-1\s+(\d{1,2}/\d{1,2}/\d{4})\s+'
+                                r'2-3\s+(\d{1,2}/\d{1,2}/\d{4})\s+'
+                                r'4-5\s+(\d{1,2}/\d{1,2}/\d{4})\s+'
+                                r'6-7\s+(\d{1,2}/\d{1,2}/\d{4})\s+'
+                                r'8-9\s+(\d{1,2}/\d{1,2}/\d{4})',
+                                re.I | re.S
+                                )
+
+                        match_iva = patron_iva.search(bloque_iva)
+
+                        if match_iva:
+                            periodo_iva = match_iva.group(1)
+
+                            filas_iva = [
+                                ['0-1', match_iva.group(2)],
+                                ['2-3', match_iva.group(3)],
+                                ['4-5', match_iva.group(4)],
+                                ['6-7', match_iva.group(5)],
+                                ['8-9', match_iva.group(6)],
+                                ]
+
+                            fechas_iva = [
+                                dmy_to_iso(match_iva.group(i))
+                                for i in range(2, 7)
+                                ]
+
+                            items.append(
+                                dict(
+                                    org='ARCA',
+                                    cat='iva',
+                                    title='IVA',
+                                    period=periodo_iva,
+                                    date=min(fechas_iva),
+                                    rows=filas_iva,
+                                    source=iva_url
+                                )
+                            )
+
+                            print(
+                                'ARCA IVA mensual:',
+                                periodo_iva,
+                                filas_iva
+                            )
                         else:
                             print(
-                                'IVA MENSUAL BLOQUE: NO ENCONTRADO'
-                           )
+                                'ARCA IVA mensual: patrón no encontrado'
+                            )
+                        else:
+                            print(
+                                'ARCA IVA mensual: bloque no encontrado'
+                            )
                     except Exception as e:
                         print(
                             'IVA POST ERROR:',
