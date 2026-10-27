@@ -189,7 +189,7 @@ def arca_home():
                         'terminacionCuit': 'Todos',
                         'impuestosSeleccionados': '1',
                     }
-
+                       print('GANANCIAS CODIGO DISPONIBLE: 16')
                     try:
                         respuesta_iva = S.post(
                             action,
