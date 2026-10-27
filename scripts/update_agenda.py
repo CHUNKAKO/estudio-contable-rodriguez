@@ -197,6 +197,28 @@ def arca_home():
                         'terminacionCuit': 'Todos',
                         'impuestosSeleccionados': '16',
                     }
+
+                    try:
+                        respuesta_ganancias = S.post(
+                            action,
+                            data=datos_ganancias,
+                            timeout=TIMEOUT
+                        )
+                        respuesta_ganancias.raise_for_status()
+
+                        soup_ganancias = BeautifulSoup(
+                            respuesta_ganancias.text,
+                            'html.parser'
+                        )
+
+                        texto_ganancias = ' '.join(
+                            re.sub(r'\s+', ' ', x.strip())
+                            for x in soup_ganancias.stripped_strings
+                            if x.strip()
+                        )
+
+                        print(
+                            'GANANCIAS POST STATUS:',                    
                     
                     try:
                         respuesta_iva = S.post(
