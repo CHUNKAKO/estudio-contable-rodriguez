@@ -284,10 +284,6 @@ def arca_home():
                             print(
                                 'ARCA IVA mensual: patrón no encontrado'
                             )
-                        else:
-                            print(
-                                'ARCA IVA mensual: bloque no encontrado'
-                            )
                     except Exception as e:
                         print(
                             'IVA POST ERROR:',
