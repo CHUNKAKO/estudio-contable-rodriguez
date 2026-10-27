@@ -131,6 +131,8 @@ def arca_home():
     ]
 
     for iva_url in iva_urls:
+        print('IVA PROBANDO URL:', iva_url)
+        
         try:
             iva_html = get(iva_url)
             iva_soup = BeautifulSoup(iva_html, 'html.parser')
