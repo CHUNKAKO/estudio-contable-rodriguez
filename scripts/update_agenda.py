@@ -155,19 +155,12 @@ def arca_home():
                     label = a.get_text(' ', strip=True)
                     href = urljoin(iva_url, a['href'])
 
-                    if (
-                        'venc' in label.lower()
-                        or 'iva' in label.lower()
-                        or 'pago' in label.lower()
-                        or 'venc' in href.lower()
-                        or 'iva' in href.lower()
-                    ):
-                        print(
-                            'IVA LINK:',
-                            label[:100],
-                            '=>',
-                            href
-                        )
+                    print(
+                        'ARCA LINK:',
+                        label[:120],
+                        '=>',
+                        href
+                    )
 
         except Exception as e:
             print(
