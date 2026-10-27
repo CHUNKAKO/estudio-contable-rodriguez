@@ -149,7 +149,7 @@ def arca_home():
                     'IVA TEXTO:',
                     repr(iva_text[:1200])
                 )
-               print('--- FORMULARIOS ARCA ---')
+                print('--- FORMULARIOS ARCA ---')
 
                 for form in iva_soup.find_all('form'):
                     print(
