@@ -127,6 +127,7 @@ def arca_home():
         'https://www.arca.gob.ar/iva/',
         'https://www.arca.gob.ar/iva/default.asp',
         'https://ftp.arca.gob.ar/regimengeneral/default.asp',
+        'https://ftp.arca.gob.ar/iva/responsables-inscriptos/',
     ]
 
     for iva_url in iva_urls:
