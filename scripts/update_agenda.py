@@ -228,7 +228,21 @@ def arca_home():
                             'IVA RESULTADO TEXTO:',
                             repr(texto_resultado[:5000])
                         )
+                            marcador_iva = 'Presentación de la declaración jurada mensual'
 
+                            pos_iva = texto_resultado.find(marcador_iva)
+
+                            if pos_iva != -1:
+                                bloque_iva = texto_resultado[pos_iva:pos_iva + 1200]
+
+                                print(
+                                    'IVA MENSUAL BLOQUE:',
+                                    repr(bloque_iva)
+                                )
+                            else:
+                                print(
+                                    'IVA MENSUAL BLOQUE: NO ENCONTRADO'
+                                )
                     except Exception as e:
                         print(
                             'IVA POST ERROR:',
