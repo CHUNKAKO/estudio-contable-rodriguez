@@ -149,7 +149,33 @@ def arca_home():
                     'IVA TEXTO:',
                     repr(iva_text[:1200])
                 )
+               print('--- FORMULARIOS ARCA ---')
 
+                for form in iva_soup.find_all('form'):
+                    print(
+                        'FORM:',
+                        'action=', form.get('action'),
+                        'method=', form.get('method')
+                    )
+
+                    for campo in form.find_all(['input', 'select', 'button']):
+                        print(
+                            'CAMPO:',
+                            campo.name,
+                            'name=', campo.get('name'),
+                            'value=', campo.get('value'),
+                            'type=', campo.get('type')
+                        )
+
+                        if campo.name == 'select':
+                            for opcion in campo.find_all('option'):
+                                print(
+                                    'OPCION:',
+                                    'value=', opcion.get('value'),
+                                    'texto=', opcion.get_text(' ', strip=True)
+                                )
+
+                print('--- FIN FORMULARIOS ARCA ---')
                 for a in iva_soup.find_all('a', href=True):
                     label = a.get_text(' ', strip=True)
                     href = urljoin(iva_url, a['href'])
