@@ -122,7 +122,7 @@ def arca_home():
     # DIAGNÓSTICO IVA
     # ---------------------------------------------------------
     iva_urls = [
-        'https://ftp.arca.gob.ar/iva/responsables-inscriptos/',
+        'https://ftp.arca.gob.ar/iva/iva-simple/default.asp',
     ]
 
     for iva_url in iva_urls:
