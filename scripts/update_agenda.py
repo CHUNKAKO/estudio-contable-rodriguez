@@ -118,7 +118,68 @@ def arca_home():
                 str(e)[:160]
             )
 
-    return items
+    # ---------------------------------------------------------
+    # DIAGNÓSTICO IVA
+    # ---------------------------------------------------------
+    iva_urls = [
+        'https://ftp.arca.gob.ar/iva/',
+        'https://ftp.arca.gob.ar/iva/default.asp',
+        'https://www.arca.gob.ar/iva/',
+        'https://www.arca.gob.ar/iva/default.asp',
+        'https://ftp.arca.gob.ar/regimengeneral/default.asp',
+    ]
+
+    for iva_url in iva_urls:
+        try:
+            iva_html = get(iva_url)
+            iva_soup = BeautifulSoup(iva_html, 'html.parser')
+
+            iva_text = ' '.join(
+                re.sub(r'\s+', ' ', x.strip())
+                for x in iva_soup.stripped_strings
+                if x.strip()
+            )
+
+            print(
+                'IVA INTENTO:',
+                iva_url,
+                '- caracteres:',
+                len(iva_text)
+            )
+
+            if iva_text:
+                print(
+                    'IVA TEXTO:',
+                    repr(iva_text[:1200])
+                )
+
+                for a in iva_soup.find_all('a', href=True):
+                    label = a.get_text(' ', strip=True)
+                    href = urljoin(iva_url, a['href'])
+
+                    if (
+                        'venc' in label.lower()
+                        or 'iva' in label.lower()
+                        or 'pago' in label.lower()
+                        or 'venc' in href.lower()
+                        or 'iva' in href.lower()
+                    ):
+                        print(
+                            'IVA LINK:',
+                            label[:100],
+                            '=>',
+                            href
+                        )
+
+        except Exception as e:
+            print(
+                'IVA ERROR:',
+                iva_url,
+                '-',
+                str(e)[:160]
+            )
+        
+        return items
 
 
 def arba_iibb_local():
