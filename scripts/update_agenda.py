@@ -176,6 +176,66 @@ def arca_home():
                                 )
 
                 print('--- FIN FORMULARIOS ARCA ---')
+                print('--- PRUEBA CONSULTA IVA ARCA ---')
+
+                form = iva_soup.find('form')
+
+                if form:
+                    action = urljoin(iva_url, form.get('action', ''))
+
+                    datos_iva = {
+                        'fechaVDesde': '01/10/2026',
+                        'fechaVHasta': '31/10/2026',
+                        'terminacionCuit': 'Todos',
+                        'impuestosASeleccionar': '1',
+                    }
+
+                    try:
+                        respuesta_iva = S.post(
+                            action,
+                            data=datos_iva,
+                            timeout=TIMEOUT
+                        )
+                        respuesta_iva.raise_for_status()
+
+                        soup_resultado = BeautifulSoup(
+                            respuesta_iva.text,
+                            'html.parser'
+                        )
+
+                        texto_resultado = ' '.join(
+                            re.sub(r'\s+', ' ', x.strip())
+                            for x in soup_resultado.stripped_strings
+                            if x.strip()
+                        )
+
+                        print(
+                            'IVA POST URL:',
+                            respuesta_iva.url
+                        )
+
+                        print(
+                            'IVA POST STATUS:',
+                            respuesta_iva.status_code
+                        )
+
+                        print(
+                            'IVA RESULTADO CARACTERES:',
+                            len(texto_resultado)
+                        )
+
+                        print(
+                            'IVA RESULTADO TEXTO:',
+                            repr(texto_resultado[:5000])
+                        )
+
+                    except Exception as e:
+                        print(
+                            'IVA POST ERROR:',
+                            str(e)[:300]
+                        )
+
+                print('--- FIN PRUEBA CONSULTA IVA ARCA ---')
                 for a in iva_soup.find_all('a', href=True):
                     label = a.get_text(' ', strip=True)
                     href = urljoin(iva_url, a['href'])
