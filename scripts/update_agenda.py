@@ -190,6 +190,14 @@ def arca_home():
                         'impuestosSeleccionados': '1',
                     }
                     print('GANANCIAS CODIGO DISPONIBLE: 16')
+                    
+                    datos_ganancias = {
+                        'fechaVDesde': '01/10/2026',
+                        'fechaVHasta': '31/10/2026',
+                        'terminacionCuit': 'Todos',
+                        'impuestosSeleccionados': '16',
+                    }
+                    
                     try:
                         respuesta_iva = S.post(
                             action,
