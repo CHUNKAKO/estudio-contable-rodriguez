@@ -218,8 +218,25 @@ def arca_home():
                         )
 
                         print(
-                            'GANANCIAS POST STATUS:',                    
-                    
+                            'GANANCIAS POST STATUS:',
+                            respuesta_ganancias.status_code
+                        )
+
+                        print(
+                            'GANANCIAS RESULTADO CARACTERES:',
+                            len(texto_ganancias)
+                        )
+
+                        print(
+                            'GANANCIAS RESULTADO TEXTO:',
+                            repr(texto_ganancias[:5000])
+                        )
+
+                    except Exception as e:
+                        print(
+                            'GANANCIAS POST ERROR:',
+                            str(e)[:300]
+                            
                     try:
                         respuesta_iva = S.post(
                             action,
