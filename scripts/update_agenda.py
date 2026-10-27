@@ -232,6 +232,23 @@ def arca_home():
                             repr(texto_ganancias[:12000])
                         )
 
+                        marcador_ganancias = 'GANANCIAS PERSONAS JURÍDICAS - Versión 20.0'
+                        pos_ganancias = texto_ganancias.find(marcador_ganancias)
+
+                        if pos_ganancias != -1:
+                            bloque_ganancias = texto_ganancias[
+                                pos_ganancias:pos_ganancias + 1800
+                            ]
+
+                            print(
+                                'GANANCIAS PJ BLOQUE:',
+                                repr(bloque_ganancias)
+                            )
+                        else:
+                            print(
+                                'GANANCIAS PJ BLOQUE: NO ENCONTRADO'
+                            )
+                    
                     except Exception as e:
                         print(
                             'GANANCIAS POST ERROR:',
