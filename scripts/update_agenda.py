@@ -187,7 +187,7 @@ def arca_home():
                         'fechaVDesde': '01/10/2026',
                         'fechaVHasta': '31/10/2026',
                         'terminacionCuit': 'Todos',
-                        'impuestosASeleccionar': '1',
+                        'impuestosSeleccionados': '1',
                     }
 
                     try:
