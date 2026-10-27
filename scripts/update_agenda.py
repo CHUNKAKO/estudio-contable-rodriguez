@@ -236,6 +236,7 @@ def arca_home():
                         print(
                             'GANANCIAS POST ERROR:',
                             str(e)[:300]
+                        )
                             
                     try:
                         respuesta_iva = S.post(
