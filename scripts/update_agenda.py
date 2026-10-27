@@ -122,9 +122,8 @@ def arca_home():
     # DIAGNÓSTICO IVA
     # ---------------------------------------------------------
     iva_urls = [
-        'https://www.arca.gob.ar/vencimientos/',
+        'https://seti.afip.gob.ar/av/seleccionVencimientos.do',
     ]
-
     for iva_url in iva_urls:
         print('IVA PROBANDO URL:', iva_url)
         
