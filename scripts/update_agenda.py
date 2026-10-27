@@ -229,7 +229,7 @@ def arca_home():
 
                         print(
                             'GANANCIAS RESULTADO TEXTO:',
-                            repr(texto_ganancias[:5000])
+                            repr(texto_ganancias[:12000])
                         )
 
                     except Exception as e:
