@@ -1,11 +1,11 @@
 {
   "meta": {
     "version": "4.3",
-    "generated_at": "2026-10-28T10:55:06.704655+00:00",
+    "generated_at": "2026-10-28T11:41:51.119566+00:00",
     "sources": {
       "ARCA": {
         "ok": true,
-        "count": 2
+        "count": 4
       },
       "ARBA_IIBB": {
         "ok": true,
@@ -456,6 +456,50 @@
       "source": "https://web.arba.gov.ar/vencimientos"
     },
     {
+      "org": "ARCA",
+      "cat": "ganancias",
+      "title": "Ganancias Personas Jurídicas - DDJJ",
+      "period": "ejercicios con cierre en Mayo/2026",
+      "date": "2026-10-13",
+      "rows": [
+        [
+          "0-1-2-3",
+          "13/10/2026"
+        ],
+        [
+          "4-5-6",
+          "14/10/2026"
+        ],
+        [
+          "7-8-9",
+          "15/10/2026"
+        ]
+      ],
+      "source": "https://seti.afip.gob.ar/av/seleccionVencimientos.do"
+    },
+    {
+      "org": "ARCA",
+      "cat": "ganancias",
+      "title": "Ganancias Personas Jurídicas - Saldo",
+      "period": "ejercicios con cierre en Mayo/2026",
+      "date": "2026-10-14",
+      "rows": [
+        [
+          "0-1-2-3",
+          "14/10/2026"
+        ],
+        [
+          "4-5-6",
+          "15/10/2026"
+        ],
+        [
+          "7-8-9",
+          "16/10/2026"
+        ]
+      ],
+      "source": "https://seti.afip.gob.ar/av/seleccionVencimientos.do"
+    },
+    {
       "org": "ARBA",
       "cat": "convenio",
       "title": "Convenio Multilateral",
@@ -524,20 +568,6 @@
         ]
       ],
       "source": "https://ftp.arca.gob.ar/monotributo/default.asp"
-    },
-    {
-      "org": "ARCA",
-      "cat": "ganancias",
-      "title": "Ganancias",
-      "period": "Declaración jurada - Período 2025",
-      "date": "2026-10-30",
-      "rows": [
-        [
-          "Todas las terminaciones",
-          "30/10/2026"
-        ]
-      ],
-      "source": "https://www.arca.gob.ar/"
     },
     {
       "org": "ARBA",
