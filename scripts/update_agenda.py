@@ -5,6 +5,7 @@ Diseñado para ejecución diaria. Conserva el último JSON válido si una fuente
 from __future__ import annotations
 import json, re, sys
 from datetime import datetime, timezone
+from calendar import monthrange
 from pathlib import Path
 from urllib.parse import urljoin
 import requests
@@ -15,6 +16,14 @@ OUT=ROOT/'agenda_fiscal.json'
 UA='EstudioRodriguez-AgendaFiscal/4.3 (+sitio institucional; consulta fuentes publicas oficiales)'
 S=requests.Session(); S.headers.update({'User-Agent':UA})
 TIMEOUT=25
+def rango_mes_actual():
+    hoy = datetime.now()
+    ultimo_dia = monthrange(hoy.year, hoy.month)[1]
+
+    fecha_desde = f'01/{hoy.month:02d}/{hoy.year}'
+    fecha_hasta = f'{ultimo_dia:02d}/{hoy.month:02d}/{hoy.year}'
+
+    return fecha_desde, fecha_hasta
 
 def get(url):
     r=S.get(url,timeout=TIMEOUT); r.raise_for_status(); return r.text
@@ -187,9 +196,10 @@ def arca_home():
                         'impuestosSeleccionados': '1',
                     }
 
+                    fecha_desde, fecha_hasta = rango_mes_actual()
                     datos_seguridad_social = {
-                        'fechaVDesde': '01/10/2026',
-                        'fechaVHasta': '31/10/2026',
+                        'fechaVDesde': fecha_desde,
+                        'fechaVHasta': fecha_hasta,
                         'terminacionCuit': 'Todos',
                         'impuestosSeleccionados': '2',
                     }
