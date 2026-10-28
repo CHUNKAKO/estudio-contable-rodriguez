@@ -229,7 +229,7 @@ def arca_home():
                                 'SICORE CONTEXTO:',
                                 repr(
                                     texto_ganancias[
-                                        max(0, pos_sicore - 500):
+                                        max(0, pos_sicore - 1500):
                                         pos_sicore + 1500
                                     ]
                                 )
