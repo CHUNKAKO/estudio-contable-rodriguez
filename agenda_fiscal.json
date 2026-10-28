@@ -1,11 +1,11 @@
 {
   "meta": {
     "version": "4.3",
-    "generated_at": "2026-10-28T12:54:32.205953+00:00",
+    "generated_at": "2026-10-28T13:04:16.615174+00:00",
     "sources": {
       "ARCA": {
         "ok": true,
-        "count": 7
+        "count": 1
       },
       "ARBA_IIBB": {
         "ok": true,
