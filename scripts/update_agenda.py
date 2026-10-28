@@ -237,16 +237,97 @@ def arca_home():
 
                         if pos_ganancias != -1:
                             bloque_ganancias = texto_ganancias[
-                                pos_ganancias:pos_ganancias + 1800
+                                pos_ganancias:pos_ganancias + 1000
                             ]
 
-                            print(
-                                'GANANCIAS PJ BLOQUE:',
-                                repr(bloque_ganancias)
+                            patron_ganancias = re.compile(
+                                r'Presentación del formulario de declaración jurada, '
+                                r'correspondiente a:\s*'
+                                r'(ejercicios con cierre en [A-Za-zÁÉÍÓÚáéíóúñÑ]+/\d{4})'
+                                r'.*?'
+                                r'0-1-2-3\s+(\d{1,2}/\d{1,2}/\d{4})\s+'
+                                r'4-5-6\s+(\d{1,2}/\d{1,2}/\d{4})\s+'
+                                r'7-8-9\s+(\d{1,2}/\d{1,2}/\d{4})'
+                                r'.*?Ingreso del saldo resultante:\s*'
+                                r'(ejercicios con cierre en [A-Za-zÁÉÍÓÚáéíóúñÑ]+/\d{4})'
+                                r'.*?'
+                                r'0-1-2-3\s+(\d{1,2}/\d{1,2}/\d{4})\s+'
+                                r'4-5-6\s+(\d{1,2}/\d{1,2}/\d{4})\s+'
+                                r'7-8-9\s+(\d{1,2}/\d{1,2}/\d{4})',
+                                re.I | re.S
                             )
+
+                            match_ganancias = patron_ganancias.search(
+                                bloque_ganancias
+                            )
+
+                            if match_ganancias:
+                                periodo_ganancias = match_ganancias.group(1)
+
+                                filas_ddjj = [
+                                    ['0-1-2-3', match_ganancias.group(2)],
+                                    ['4-5-6', match_ganancias.group(3)],
+                                    ['7-8-9', match_ganancias.group(4)],
+                                ]
+
+                                filas_saldo = [
+                                    ['0-1-2-3', match_ganancias.group(6)],
+                                    ['4-5-6', match_ganancias.group(7)],
+                                    ['7-8-9', match_ganancias.group(8)],
+                                ]
+
+                                fechas_ddjj = [
+                                    dmy_to_iso(match_ganancias.group(i))
+                                    for i in range(2, 5)
+                                ]
+
+                                fechas_saldo = [
+                                    dmy_to_iso(match_ganancias.group(i))
+                                    for i in range(6, 9)
+                                ]
+
+                                items.append(
+                                    dict(
+                                        org='ARCA',
+                                        cat='ganancias',
+                                        title='Ganancias Personas Jurídicas - DDJJ',
+                                        period=periodo_ganancias,
+                                        date=min(fechas_ddjj),
+                                        rows=filas_ddjj,
+                                        source=iva_url
+                                    )
+                                )
+
+                                items.append(
+                                    dict(
+                                        org='ARCA',
+                                        cat='ganancias',
+                                        title='Ganancias Personas Jurídicas - Saldo',
+                                        period=periodo_ganancias,
+                                        date=min(fechas_saldo),
+                                        rows=filas_saldo,
+                                        source=iva_url
+                                    )
+                                )
+
+                                print(
+                                    'ARCA Ganancias PJ DDJJ:',
+                                    periodo_ganancias,
+                                    filas_ddjj
+                                )
+
+                                print(
+                                    'ARCA Ganancias PJ SALDO:',
+                                    periodo_ganancias,
+                                    filas_saldo
+                                )
+                            else:
+                                print(
+                                    'ARCA Ganancias PJ: patrón no encontrado'
+                                )
                         else:
                             print(
-                                'GANANCIAS PJ BLOQUE: NO ENCONTRADO'
+                                'ARCA Ganancias PJ: bloque no encontrado'
                             )
                     
                     except Exception as e:
