@@ -190,6 +190,24 @@ def arca_home():
                         'impuestosSeleccionados': '1',
                     }
                     print('GANANCIAS CODIGO DISPONIBLE: 16')
+
+                    print('ARCA IMPUESTOS DISPONIBLES:')
+
+                    for opcion in form_soup.select(
+                        'select[name="impuestosASeleccionar"] option'
+                    ):
+                        codigo = opcion.get('value', '').strip()
+                        nombre = opcion.get_text(
+                            ' ',
+                            strip=True
+                        )
+
+                        if codigo or nombre:
+                            print(
+                                'ARCA IMPUESTO:',
+                                repr(codigo),
+                                repr(nombre)
+                            )
                     
                     datos_ganancias = {
                         'fechaVDesde': '01/10/2026',
