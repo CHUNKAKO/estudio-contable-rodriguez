@@ -190,6 +190,53 @@ def arca_home():
                         'impuestosSeleccionados': '1',
                     }
                     print('GANANCIAS CODIGO DISPONIBLE: 16')
+
+                    datos_seguridad_social = {
+                        'fechaVDesde': '01/10/2026',
+                        'fechaVHasta': '31/10/2026',
+                        'terminacionCuit': 'Todos',
+                        'impuestosSeleccionados': '2',
+                    }
+
+                    try:
+                        respuesta_seguridad_social = S.post(
+                            action,
+                            data=datos_seguridad_social,
+                            timeout=TIMEOUT
+                        )
+                        respuesta_seguridad_social.raise_for_status()
+
+                        soup_seguridad_social = BeautifulSoup(
+                            respuesta_seguridad_social.text,
+                            'html.parser'
+                        )
+
+                        texto_seguridad_social = ' '.join(
+                            re.sub(r'\s+', ' ', x.strip())
+                            for x in soup_seguridad_social.stripped_strings
+                            if x.strip()
+                        )
+
+                        print(
+                            'SEGURIDAD SOCIAL POST STATUS:',
+                            respuesta_seguridad_social.status_code
+                        )
+
+                        print(
+                            'SEGURIDAD SOCIAL RESULTADO CARACTERES:',
+                            len(texto_seguridad_social)
+                        )
+
+                        print(
+                            'SEGURIDAD SOCIAL RESULTADO TEXTO:',
+                            repr(texto_seguridad_social[:12000])
+                        )
+
+                    except Exception as e:
+                        print(
+                            'SEGURIDAD SOCIAL POST ERROR:',
+                            str(e)[:300]
+                        )                    
                     
                     datos_ganancias = {
                         'fechaVDesde': '01/10/2026',
