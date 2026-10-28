@@ -232,6 +232,94 @@ def arca_home():
                             repr(texto_seguridad_social[:12000])
                         )
 
+                        marcador_seguridad_social = (
+                            'Sujeto Empleadores. R.G. (D.G.I.) N° 3834'
+                        )
+
+                        pos_seguridad_social = texto_seguridad_social.find(
+                            marcador_seguridad_social
+                        )
+
+                        if pos_seguridad_social != -1:
+                            bloque_seguridad_social = texto_seguridad_social[
+                                pos_seguridad_social:
+                                pos_seguridad_social + 1800
+                            ]
+
+                            patron_seguridad_social = re.compile(
+                                r'Presentación del formulario de declaración jurada '
+                                r'e ingreso de aportes y contribuciones de la '
+                                r'Seguridad Social y Obras Sociales, por el período '
+                                r'devengado en:\s*'
+                                r'([A-Za-zÁÉÍÓÚáéíóúñÑ]+/\d{4})'
+                                r'.*?'
+                                r'0-1-2-3\s+(\d{1,2}/\d{1,2}/\d{4})\s+'
+                                r'4-5-6\s+(\d{1,2}/\d{1,2}/\d{4})\s+'
+                                r'7-8-9\s+(\d{1,2}/\d{1,2}/\d{4})',
+                                re.I | re.S
+                            )
+
+                            match_seguridad_social = (
+                                patron_seguridad_social.search(
+                                    bloque_seguridad_social
+                                )
+                            )
+
+                            if match_seguridad_social:
+                                periodo_seguridad_social = (
+                                    match_seguridad_social.group(1)
+                                )
+
+                                filas_seguridad_social = [
+                                    [
+                                        '0-1-2-3',
+                                        match_seguridad_social.group(2)
+                                    ],
+                                    [
+                                        '4-5-6',
+                                        match_seguridad_social.group(3)
+                                    ],
+                                    [
+                                        '7-8-9',
+                                        match_seguridad_social.group(4)
+                                    ],
+                                ]
+
+                                fechas_seguridad_social = [
+                                    dmy_to_iso(
+                                        match_seguridad_social.group(i)
+                                    )
+                                    for i in range(2, 5)
+                                ]
+
+                                items.append(
+                                    dict(
+                                        org='ARCA',
+                                        cat='seguridad_social',
+                                        title='Cargas Sociales - SICOSS F.931',
+                                        period=periodo_seguridad_social,
+                                        date=min(fechas_seguridad_social),
+                                        rows=filas_seguridad_social,
+                                        source=iva_url
+                                    )
+                                )
+
+                                print(
+                                    'ARCA SEGURIDAD SOCIAL F931:',
+                                    periodo_seguridad_social,
+                                    filas_seguridad_social
+                                )
+                            else:
+                                print(
+                                    'ARCA SEGURIDAD SOCIAL F931: '
+                                    'patrón no encontrado'
+                                )
+                        else:
+                            print(
+                                'ARCA SEGURIDAD SOCIAL F931: '
+                                'bloque no encontrado'
+                            )
+                    
                     except Exception as e:
                         print(
                             'SEGURIDAD SOCIAL POST ERROR:',
