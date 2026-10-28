@@ -218,6 +218,28 @@ def arca_home():
                         )
 
                         print(
+                            'SICORE COINCIDENCIAS:',
+                            texto_ganancias.upper().count('SICORE')
+                        )
+
+                        pos_sicore = texto_ganancias.upper().find('SICORE')
+
+                        if pos_sicore != -1:
+                            print(
+                                'SICORE CONTEXTO:',
+                                repr(
+                                    texto_ganancias[
+                                        max(0, pos_sicore - 500):
+                                        pos_sicore + 1500
+                                    ]
+                                )
+                            )
+                        else:
+                            print(
+                                'SICORE CONTEXTO: NO ENCONTRADO'
+                            )
+                        
+                        print(
                             'GANANCIAS POST STATUS:',
                             respuesta_ganancias.status_code
                         )
