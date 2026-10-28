@@ -217,26 +217,172 @@ def arca_home():
                             if x.strip()
                         )
 
-                        print(
-                            'SICORE COINCIDENCIAS:',
-                            texto_ganancias.upper().count('SICORE')
+                        marcador_sicore = (
+                            'Régimen General de retenciones y/o percepciones '
+                            '(incluido el Régimen Opcional Semestral)'
                         )
-
-                        pos_sicore = texto_ganancias.upper().find('SICORE')
+                        pos_sicore = texto_ganancias.find(marcador_sicore)
 
                         if pos_sicore != -1:
-                            print(
-                                'SICORE CONTEXTO:',
-                                repr(
-                                    texto_ganancias[
-                                        max(0, pos_sicore - 1500):
-                                        pos_sicore + 1500
-                                    ]
-                                )
+                            bloque_sicore = texto_ganancias[
+                                pos_sicore:pos_sicore + 2600
+                            ]
+
+                            patron_sicore_pagos = re.compile(
+                                r'Ingreso \(Incluido el Régimen Opcional Semestral\) '
+                                r'de las percepciones efectuadas en:\s*'
+                                r'([A-Za-zÁÉÍÓÚáéíóúñÑ]+/\d{4})'
+                                r'.*?'
+                                r'de las retenciones, practicadas en:\s*'
+                                r'(2[º°]\s+quincena\s+[A-Za-zÁÉÍÓÚáéíóúñÑ]+/\d{4})'
+                                r'.*?'
+                                r'0-1-2-3\s+(\d{1,2}/\d{1,2}/\d{4})\s+'
+                                r'4-5-6\s+(\d{1,2}/\d{1,2}/\d{4})\s+'
+                                r'7-8-9\s+(\d{1,2}/\d{1,2}/\d{4})'
+                                r'.*?'
+                                r'de las retenciones, practicadas en:\s*'
+                                r'(1[º°]\s+quincena\s+[A-Za-zÁÉÍÓÚáéíóúñÑ]+/\d{4})'
+                                r'.*?'
+                                r'0-1-2-3\s+(\d{1,2}/\d{1,2}/\d{4})\s+'
+                                r'4-5-6\s+(\d{1,2}/\d{1,2}/\d{4})\s+'
+                                r'7-8-9\s+(\d{1,2}/\d{1,2}/\d{4})',
+                                re.I | re.S
                             )
+
+                            match_sicore_pagos = patron_sicore_pagos.search(
+                                bloque_sicore
+                            )
+
+                            if match_sicore_pagos:
+                                periodo_sicore_pago = (
+                                    match_sicore_pagos.group(1)
+                                    + ' / '
+                                    + match_sicore_pagos.group(2)
+                                )
+
+                                filas_sicore_pago = [
+                                    ['0-1-2-3', match_sicore_pagos.group(3)],
+                                    ['4-5-6', match_sicore_pagos.group(4)],
+                                    ['7-8-9', match_sicore_pagos.group(5)],
+                                ]
+
+                                fechas_sicore_pago = [
+                                    dmy_to_iso(match_sicore_pagos.group(i))
+                                    for i in range(3, 6)
+                                ]
+
+                                items.append(
+                                    dict(
+                                        org='ARCA',
+                                        cat='sicore',
+                                        title='SICORE - Percepciones y retenciones',
+                                        period=periodo_sicore_pago,
+                                        date=min(fechas_sicore_pago),
+                                        rows=filas_sicore_pago,
+                                        source=iva_url
+                                    )
+                                )
+
+                                periodo_sicore_1q = (
+                                    match_sicore_pagos.group(6)
+                                )
+
+                                filas_sicore_1q = [
+                                    ['0-1-2-3', match_sicore_pagos.group(7)],
+                                    ['4-5-6', match_sicore_pagos.group(8)],
+                                    ['7-8-9', match_sicore_pagos.group(9)],
+                                ]
+
+                                fechas_sicore_1q = [
+                                    dmy_to_iso(match_sicore_pagos.group(i))
+                                    for i in range(7, 10)
+                                ]
+
+                                items.append(
+                                    dict(
+                                        org='ARCA',
+                                        cat='sicore',
+                                        title='SICORE - Retenciones 1ª quincena',
+                                        period=periodo_sicore_1q,
+                                        date=min(fechas_sicore_1q),
+                                        rows=filas_sicore_1q,
+                                        source=iva_url
+                                    )
+                                )
+
+                                print(
+                                    'ARCA SICORE PAGOS:',
+                                    periodo_sicore_pago,
+                                    filas_sicore_pago
+                                )
+
+                                print(
+                                    'ARCA SICORE 1Q:',
+                                    periodo_sicore_1q,
+                                    filas_sicore_1q
+                                )
+                            else:
+                                print(
+                                    'ARCA SICORE PAGOS: patrón no encontrado'
+                                )
+
+                            patron_sicore_info = re.compile(
+                                r'SICORE - SISTEMA DE CONTROL DE RETENCIONES'
+                                r'.*?'
+                                r'Información \(Régimen General\) de las '
+                                r'retenciones y/o percepciones, practicadas en:\s*'
+                                r'([A-Za-zÁÉÍÓÚáéíóúñÑ]+/\d{4})'
+                                r'.*?'
+                                r'0-1-2-3\s+(\d{1,2}/\d{1,2}/\d{4})\s+'
+                                r'4-5-6\s+(\d{1,2}/\d{1,2}/\d{4})\s+'
+                                r'7-8-9\s+(\d{1,2}/\d{1,2}/\d{4})',
+                                re.I | re.S
+                            )
+
+                            match_sicore_info = patron_sicore_info.search(
+                                bloque_sicore
+                            )
+
+                            if match_sicore_info:
+                                periodo_sicore_info = (
+                                    match_sicore_info.group(1)
+                                )
+
+                                filas_sicore_info = [
+                                    ['0-1-2-3', match_sicore_info.group(2)],
+                                    ['4-5-6', match_sicore_info.group(3)],
+                                    ['7-8-9', match_sicore_info.group(4)],
+                                ]
+
+                                fechas_sicore_info = [
+                                    dmy_to_iso(match_sicore_info.group(i))
+                                    for i in range(2, 5)
+                                ]
+
+                                items.append(
+                                    dict(
+                                        org='ARCA',
+                                        cat='sicore',
+                                        title='SICORE - Información F. 744',
+                                        period=periodo_sicore_info,
+                                        date=min(fechas_sicore_info),
+                                        rows=filas_sicore_info,
+                                        source=iva_url
+                                    )
+                                )
+
+                                print(
+                                    'ARCA SICORE INFORMACION:',
+                                    periodo_sicore_info,
+                                    filas_sicore_info
+                                )
+                            else:
+                                print(
+                                    'ARCA SICORE INFORMACION: patrón no encontrado'
+                                )
                         else:
                             print(
-                                'SICORE CONTEXTO: NO ENCONTRADO'
+                                'ARCA SICORE: bloque no encontrado'
                             )
                         
                         print(
