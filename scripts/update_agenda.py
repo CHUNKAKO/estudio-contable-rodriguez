@@ -54,9 +54,6 @@ def arca_home():
                 for x in mono_soup.stripped_strings
                 if x.strip()
             )
-           
-            print('MONO TEXTO:', repr(mono_text[-500:]))
-            print('MONO CONTIENE PAGO MENSUAL:', 'pago mensual' in mono_text.lower())
             
             mono_match = re.search(
                 r'(ENE|FEB|MAR|ABR|MAY|JUN|JUL|AGO|SEP|OCT|NOV|DIC)'
@@ -189,7 +186,6 @@ def arca_home():
                         'terminacionCuit': 'Todos',
                         'impuestosSeleccionados': '1',
                     }
-                    print('GANANCIAS CODIGO DISPONIBLE: 16')
 
                     datos_seguridad_social = {
                         'fechaVDesde': '01/10/2026',
@@ -215,21 +211,6 @@ def arca_home():
                             re.sub(r'\s+', ' ', x.strip())
                             for x in soup_seguridad_social.stripped_strings
                             if x.strip()
-                        )
-
-                        print(
-                            'SEGURIDAD SOCIAL POST STATUS:',
-                            respuesta_seguridad_social.status_code
-                        )
-
-                        print(
-                            'SEGURIDAD SOCIAL RESULTADO CARACTERES:',
-                            len(texto_seguridad_social)
-                        )
-
-                        print(
-                            'SEGURIDAD SOCIAL RESULTADO TEXTO:',
-                            repr(texto_seguridad_social[:12000])
                         )
 
                         marcador_seguridad_social = (
@@ -519,21 +500,6 @@ def arca_home():
                             print(
                                 'ARCA SICORE: bloque no encontrado'
                             )
-                        
-                        print(
-                            'GANANCIAS POST STATUS:',
-                            respuesta_ganancias.status_code
-                        )
-
-                        print(
-                            'GANANCIAS RESULTADO CARACTERES:',
-                            len(texto_ganancias)
-                        )
-
-                        print(
-                            'GANANCIAS RESULTADO TEXTO:',
-                            repr(texto_ganancias[:12000])
-                        )
 
                         marcador_ganancias = 'GANANCIAS PERSONAS JURÍDICAS - Versión 20.0'
                         pos_ganancias = texto_ganancias.find(marcador_ganancias)
@@ -658,25 +624,6 @@ def arca_home():
                             if x.strip()
                         )
 
-                        print(
-                            'IVA POST URL:',
-                            respuesta_iva.url
-                        )
-
-                        print(
-                            'IVA POST STATUS:',
-                            respuesta_iva.status_code
-                        )
-
-                        print(
-                            'IVA RESULTADO CARACTERES:',
-                            len(texto_resultado)
-                        )
-
-                        print(
-                            'IVA RESULTADO TEXTO:',
-                            repr(texto_resultado[:5000])
-                        )
                         marcador_iva = 'Presentación de la declaración jurada mensual'
                         pos_iva = texto_resultado.find(marcador_iva)
 
