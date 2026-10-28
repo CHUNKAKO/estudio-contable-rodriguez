@@ -1,11 +1,11 @@
 {
   "meta": {
     "version": "4.3",
-    "generated_at": "2026-10-28T13:42:47.890463+00:00",
+    "generated_at": "2026-10-28T13:46:51.540409+00:00",
     "sources": {
       "ARCA": {
         "ok": true,
-        "count": 7
+        "count": 8
       },
       "ARBA_IIBB": {
         "ok": true,
@@ -440,6 +440,28 @@
         ]
       ],
       "source": "https://web.arba.gov.ar/vencimientos"
+    },
+    {
+      "org": "ARCA",
+      "cat": "seguridad_social",
+      "title": "Cargas Sociales - SICOSS F.931",
+      "period": "Septiembre/2026",
+      "date": "2026-10-09",
+      "rows": [
+        [
+          "0-1-2-3",
+          "09/10/2026"
+        ],
+        [
+          "4-5-6",
+          "13/10/2026"
+        ],
+        [
+          "7-8-9",
+          "14/10/2026"
+        ]
+      ],
+      "source": "https://seti.afip.gob.ar/av/seleccionVencimientos.do"
     },
     {
       "org": "ARCA",
