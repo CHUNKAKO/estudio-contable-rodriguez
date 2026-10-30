@@ -1,26 +1,23 @@
 {
   "meta": {
     "version": "4.3",
-    "generated_at": "2026-10-29T10:58:13.539430+00:00",
+    "generated_at": "2026-10-30T10:54:56.213647+00:00",
     "sources": {
       "ARCA": {
         "ok": true,
         "count": 8
       },
       "ARBA_IIBB": {
-        "ok": false,
-        "error": "HTTPSConnectionPool(host='web.arba.gov.ar', port=443): Max retries exceeded with url: /vencimientos-contribuyentes-locales (Caused by ConnectTimeoutError(<HTTPSConnection(host='web",
-        "count": 0
+        "ok": true,
+        "count": 1
       },
       "ARBA_CONVENIO": {
-        "ok": false,
-        "error": "HTTPSConnectionPool(host='web.arba.gov.ar', port=443): Max retries exceeded with url: /vencimientos-contribuyentes-convenio (Caused by ConnectTimeoutError(<HTTPSConnection(host='we",
-        "count": 0
+        "ok": true,
+        "count": 12
       },
       "ARBA_PATRIMONIALES": {
-        "ok": false,
-        "error": "HTTPSConnectionPool(host='web.arba.gov.ar', port=443): Max retries exceeded with url: /vencimientos (Caused by ConnectTimeoutError(<HTTPSConnection(host='web.arba.gov.ar', port=443",
-        "count": 0
+        "ok": true,
+        "count": 21
       }
     },
     "policy": "Fuentes oficiales; último dato válido se conserva ante fallos de extracción."
