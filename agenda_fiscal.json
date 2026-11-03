@@ -1,7 +1,7 @@
 {
   "meta": {
     "version": "4.3",
-    "generated_at": "2026-11-02T11:09:00.744015+00:00",
+    "generated_at": "2026-11-03T11:02:34.748272+00:00",
     "sources": {
       "ARCA": {
         "ok": true,
@@ -601,20 +601,6 @@
     },
     {
       "org": "ARCA",
-      "cat": "monotributo",
-      "title": "Monotributo",
-      "period": "Pago mensual",
-      "date": "2026-10-20",
-      "rows": [
-        [
-          "Todas las terminaciones",
-          "20/10/2026"
-        ]
-      ],
-      "source": "https://ftp.arca.gob.ar/monotributo/default.asp"
-    },
-    {
-      "org": "ARCA",
       "cat": "sicore",
       "title": "SICORE - Retenciones 1ª quincena",
       "period": "1º quincena Octubre/2026",
@@ -696,6 +682,20 @@
         ]
       ],
       "source": "https://web.arba.gov.ar/vencimientos-contribuyentes-convenio"
+    },
+    {
+      "org": "ARCA",
+      "cat": "monotributo",
+      "title": "Monotributo",
+      "period": "Pago mensual",
+      "date": "2026-11-20",
+      "rows": [
+        [
+          "Todas las terminaciones",
+          "20/11/2026"
+        ]
+      ],
+      "source": "https://ftp.arca.gob.ar/monotributo/default.asp"
     },
     {
       "org": "ARBA",
